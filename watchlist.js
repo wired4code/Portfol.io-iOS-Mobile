@@ -10,6 +10,8 @@ import React, {
   Image,
   TouchableHighlight,
   ListView,
+  ScrollView,
+  RefreshControl,
   ActivityIndicatorIOS
 } from 'react-native';  
 
@@ -91,8 +93,8 @@ class WatchlistInner extends Component {
           <View style ={{
             flex:1,
             justifyContent: 'flex-start',
-            paddingTop: 75,
-            paddingBottom: 100
+            paddingTop: 20,
+            paddingBottom: 10
 
           }}>
           <TouchableHighlight style={styles.button} onPress={this._onPressButton.bind(this)}> 
@@ -252,10 +254,6 @@ function percent (number) {
   }
 }
   
-    
-      
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -268,6 +266,11 @@ const styles = StyleSheet.create({
   wrapper:{
     flex:1
   },
+  
+  scrollview: {
+    flex: 1
+  },
+
   header: {
   	alignItems: 'center',
   	justifyContent: 'center',
