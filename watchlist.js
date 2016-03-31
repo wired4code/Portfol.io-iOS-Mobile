@@ -8,8 +8,10 @@ import React, {
   TextInput,
   View,
   Image,
-  TouchableHighlight,
+  TouchableOpacity,
   ListView,
+  ScrollView,
+  RefreshControl,
   ActivityIndicatorIOS
 } from 'react-native';  
 
@@ -56,7 +58,7 @@ class WatchlistInner extends Component {
       }}>
       <Text style={{
 				color: '#333',
-				backgroundColor:'#F5FCFF',
+				backgroundColor:'white',
 				textAlign: 'center',
         flex: 1
         
@@ -65,7 +67,7 @@ class WatchlistInner extends Component {
 			</Text>
       <Text style={{
         color: '#333',
-        backgroundColor:'#F5FCFF',
+        backgroundColor:'white',
         flex: 1,
         textAlign: 'center'
       }}>
@@ -89,33 +91,36 @@ class WatchlistInner extends Component {
 	render() {
 		return (
           <View style ={{
-            flex:1,
+            
             justifyContent: 'flex-start',
-            paddingTop: 75,
-            paddingBottom: 100
-
+            paddingTop: 60,
+            paddingBottom: 50,
+            marginBottom: 10
+            
           }}>
-          <TouchableHighlight style={styles.button} onPress={this._onPressButton.bind(this)}> 
-                    
-            <Text style={styles.buttonText}>Watchlist</Text>
+          <TouchableOpacity onPress={this._onPressButton.bind(this)}> 
+            <Image style={styles.logo} source={require('./refresh.png')}/>
 
             
-         </TouchableHighlight>
+         </TouchableOpacity>
              <ListView
                dataSource={this.state.dataSource}
+               initialListSize={15}
+               automaticallyAdjustContentInsets={true}
+               renderRow={this.renderRow.bind(this)}
                renderRow={this.renderRow.bind(this)} />
+        
           </View>
 			)
 	}
+
 
 	componentDidMount(){
 		this._onPressButton();
 	}
 
 
-
 	_onPressButton(){
-		console.log(this.props.info,'hi')
 		
 		fetch('https://portfolioio.herokuapp.com/api/watchlist/' + this.props.info.userId
 			, {
@@ -130,19 +135,14 @@ class WatchlistInner extends Component {
       .then((response)=> { 
       	var datas =[]
         var da = JSON.parse(response._bodyText);
-        console.log(da,'da')
         for(var key in da){
           datas.push(key)
         }
-        
-        //this.setState({dataSource: this.state.dataSource.cloneWithRows(datas)})
-        console.log(datas,'data')
         var list ='';
         for(var i=0; i<datas.length; i++){
           list+=datas[i] + '+';
         }
         list= list.slice(0,-1);
-
         fetch('http://finance.yahoo.com/d/quotes.csv?s=' + list + '&f=sac1p2',{
         	method: 'GET'
         }
@@ -152,12 +152,10 @@ class WatchlistInner extends Component {
         	var results =[];
         	var stocks =[];
         	var final = [];
-        	
         	var ask = response._bodyText.toString().split('\n');
         	ask.forEach(function(item){
               results.push(item.split(','))
         	})
-
             results.forEach(function(stocks){
             	stocks.forEach(function(stock){
               var result1 = stock.replace(/\"/g,'');
@@ -181,43 +179,27 @@ class WatchlistInner extends Component {
             })
             final.push(stocks);
             stocks=[]
-            
             })
             var finalfinal= [];
             var final2;
             final.forEach(function(stock){
             	final2 = stock.slice(4);
-            	console.log(final2,'finalll');
             	finalfinal.push(final2)
-
             })
             finalfinal.pop()
-
-            
             this.setState({dataSource: this.state.dataSource.cloneWithRows(finalfinal)})
-
-        	console.log(this.state.dataSource,'ressppp')
         })
-
-        
         response.json();
       })
-      // .then((responseData)=>{
-      //   console.log(responseData,'ressss');
-      //   //this.setState({dataSource: this.state.dataSource.cloneWithRows(responseData)});
-      // })
 	}
-
-
 }
 
 function color(number) {
   number = parseFloat(number)
-  console.log(typeof number, '&&&&&')
   if(number >= 0){
   return {
     color: '#00cc00',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: 'white',
     flex: 1,
     textAlign: 'center'
   }
@@ -225,7 +207,7 @@ function color(number) {
   if(number < 0){
     return {
       color: '#ff3300',
-      backgroundColor: '#F5FCFF',
+      backgroundColor: 'white',
       flex: 1,
       textAlign: 'center'
     }
@@ -233,11 +215,10 @@ function color(number) {
 }
 function percent (number) {
   number = parseFloat(number)
-  console.log(typeof number, '&&&&&')
   if(number >= 0){
   return {
     color: '#00cc00',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: 'white',
     flex: 1,
     textAlign: 'center'
   }
@@ -245,53 +226,40 @@ function percent (number) {
   if(number < 0){
     return {
       color: '#ff3300',
-      backgroundColor: '#F5FCFF',
+      backgroundColor: 'white',
       flex: 1,
     textAlign: 'center'
     }
   }
 }
   
-    
-      
-
-
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F5FCFF',
+    backgroundColor: 'white',
     flex: 1,
-    paddingTop:100,
+    paddingTop:30,
+    paddingBottom: 30,
     alignItems: 'center',
-    padding:10
+    
   },
   wrapper:{
     flex:1
+  },
+  
+  logo: {
+    width: 30,
+    height: 20,
+    margin: 4
+    
   },
   header: {
   	alignItems: 'center',
   	justifyContent: 'center',
   	backgroundColor: '#48BBEC',
-  	fontSize: 20
-  },
-  button:{
-    height: 50,
-    backgroundColor: '#48BBEC',
-    alignSelf: 'stretch',
-    marginTop: 10,
-    justifyContent: 'center',
-  },
-  buttonText:{
-    fontSize: 22,
-    color: '#FFF',
-    alignSelf: 'center'
+  	fontSize: 20,
+    paddingBottom: 10
   }
-  // positive: {
-  //   color: green
-  // },
-  // negative: {
-  //   color: red
-  // }
 
 });
 
